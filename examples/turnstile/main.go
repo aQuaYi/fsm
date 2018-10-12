@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	fsm "github.com/aQuaYi/gofsm"
+	"github.com/aQuaYi/fsm"
 )
 
 // Turnstile 是旋转门
