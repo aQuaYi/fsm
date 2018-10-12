@@ -1,20 +1,17 @@
 # gofsm
 
 [![License](https://img.shields.io/:license-apache-blue.svg)](LECENSE)
-[![GoDoc](https://godoc.org/github.com/smallnest/gofsm?status.png)](http://godoc.org/github.com/smallnest/gofsm)
-![travis](https://travis-ci.org/smallnest/gofsm.svg?branch=master)
-[![Coverage](http://gocover.io/_badge/github.com/smallnest/gofsm)](http://gocover.io/github.com/smallnest/gofsm)
-[![Go Report Card](https://goreportcard.com/badge/github.com/smallnest/gofsm)](https://goreportcard.com/report/github.com/smallnest/gofsm)
+[![GoDoc](https://godoc.org/github.com/aQuaYi/gofsm?status.png)](http://godoc.org/github.com/aQuaYi/gofsm)
+![travis](https://travis-ci.org/aQuaYi/gofsm.svg?branch=master)
+[![Coverage](http://gocover.io/_badge/github.com/aQuaYi/gofsm)](http://gocover.io/github.com/aQuaYi/gofsm)
+[![Go Report Card](https://goreportcard.com/badge/github.com/aQuaYi/gofsm)](https://goreportcard.com/report/github.com/aQuaYi/gofsm)
 
-[gofsm](https://github.com/smallnest/gofsm)是一个简单、小巧而又特色的有限状态机（FSM）。
+本项目基于 [smallnest 的 gofsm](https://github.com/smallnest/gofsm) 整理修改而来，是一个简单、小巧而又特色的有限状态机（FSM）。
+和[其他 Go 语言 FSM 项目](https://github.com/search?l=Go&o=desc&q=fsm&s=stars&type=Repositories)相比较，本 FSM 有以下特点:
 
-github已经有了很多个状态机的实现，比如文末列举的一些，还为什么要再发明轮子呢？
-
-原因在于这些状态机有一个特点，就是一个状态机维护一个对象的状态，这样一个状态机就和一个具体的图像实例关联在一起，在有些情况下，这没有什么问题，而且是很好的设计，而且比较符合状态机的定义。但是在有些情况下，当我们需要维护成千上百个对象的时候，需要创建成千上百个状态机对象，这其实是很大的浪费，因为在大部分情况下，对象本身自己会维护/保持自己当前的状态，我们只需把对象当前的状态传递给一个共用的状态机就可以了，也就是gofsm本身是“stateless”，本身它包维护一个或者多个对象的状态，所有需要的输入由调用者输入，它只负责状态的转换的逻辑，所以它的实现非常的简洁实用，这是创建gofsm的一个目的。
-
-第二个原因它提供了 Moore 和 Mealy 两种状态机的统一接口，并且提供了 UML 状态机风格的 Action 处理，以程序员更熟悉的方式处理状态的改变。
-
-第三个原因，当我们谈论起状态机的时候，我们总会画一个状态转换图，大家可以根据这这张图进行讨论、设计、实现和验证状态的迁移。但是对于代码来说，实现真的和你的设计是一致的吗，你怎么保证？gofsm提供了一个简单的方法，那就是它可以输出图片或者pdf文件，你可以利用输出的状态机图和你的设计进行比较，看看实现和设计是否一致。
+1. gofsm 本身是 `stateless`，只负责转换状态的逻辑，与具体对象的状态维护代码实现了正交。
+1. 提供了 [Moore](https://zh.wikipedia.org/wiki/%E6%91%A9%E5%B0%94%E5%9E%8B%E6%9C%89%E9%99%90%E7%8A%B6%E6%80%81%E6%9C%BA) 和 [Mealy](https://zh.wikipedia.org/wiki/%E7%B1%B3%E5%88%A9%E5%9E%8B%E6%9C%89%E9%99%90%E7%8A%B6%E6%80%81%E6%9C%BA) 两种状态机的统一接口和 UML 状态机风格的 Action 处理方式。
+1. 可以生成具体对象的状态转换图，易于检查代码。
 
 ![gofsm生成的闸门状态图](state.png)
 
@@ -70,7 +67,7 @@ gofsm参考了 [elimisteve/fsm](https://github.com/elimisteve/fsm) 的实现，�
 使用gofsm也很简单，当然第一步将库拉到本地：
 
 ```sh
-go get -u github.com/smallnest/gofsm
+go get -u github.com/aQuaYi/gofsm
 ```
 
 我们以上面的闸门为例，看看gofsm是如何使用的。
@@ -216,9 +213,9 @@ func (m *StateMachine) ExportWithDetails(outfile string, format string, layout s
 
 ## 其它 Go 语言实现的 FSM
 
-如果你发现gofsm的功能需要改进，或者有一些想法、或者发现了bug，请不用迟疑，在[issue](https://github.com/smallnest/gofsm/issues)中提交你的意见和建议，我会及时的进行反馈。
+如果你发现gofsm的功能需要改进，或者有一些想法、或者发现了bug，请不用迟疑，在[issue](https://github.com/aQuaYi/gofsm/issues)中提交你的意见和建议，我会及时的进行反馈。
 
-如果你觉得本项目有用，或者将来可能会使用，请star这个项目 [smallnest/gofsm](https://github.com/smallnest/gofsm)。
+如果你觉得本项目有用，或者将来可能会使用，请star这个项目 [aQuaYi/gofsm](https://github.com/aQuaYi/gofsm)。
 
 如果你想比较其它的 Go 语言实现的 fsm，可以参考下面的列表：
 
