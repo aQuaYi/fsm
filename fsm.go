@@ -96,7 +96,7 @@ func (m *StateMachine) ExportWithDetails(outfile string, format string, layout s
 
 	rankdir=LR
 	node[width=1 fixedsize=true shape=circle style=filled fillcolor="darkorchid1" ]
-	
+
 	`
 
 	for _, t := range m.transitions {
@@ -114,5 +114,4 @@ func system(c string, dot string) error {
 	cmd := exec.Command(`/bin/sh`, `-c`, c)
 	cmd.Stdin = strings.NewReader(dot)
 	return cmd.Run()
-
 }

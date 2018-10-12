@@ -3,15 +3,9 @@ package main
 import (
 	"fmt"
 	"log"
-	"testing"
 
 	fsm "github.com/aQuaYi/gofsm"
 )
-
-func main() {
-
-	return
-}
 
 // Turnstile 是旋转门
 type Turnstile struct {
@@ -24,36 +18,22 @@ type Turnstile struct {
 }
 
 func initFSM() *fsm.StateMachine {
-	delegate := &DefaultDelegate{P: &TurnstileEventProcessor{}}
+	delegate := &fsm.DefaultDelegate{P: &TurnstileEventProcessor{}}
 
-	transitions := []Transition{
-		Transition{From: "Locked", Event: "Coin", To: "Unlocked", Action: "check"},
-		Transition{From: "Locked", Event: "Push", To: "Locked", Action: "invalid-push"},
-		Transition{From: "Unlocked", Event: "Push", To: "Locked", Action: "pass"},
-		Transition{From: "Unlocked", Event: "Coin", To: "Unlocked", Action: "repeat-check"},
+	transitions := []fsm.Transition{
+		fsm.Transition{From: "Locked", Event: "Coin", To: "Unlocked", Action: "check"},
+		fsm.Transition{From: "Locked", Event: "Push", To: "Locked", Action: "invalid-push"},
+		fsm.Transition{From: "Unlocked", Event: "Push", To: "Locked", Action: "pass"},
+		fsm.Transition{From: "Unlocked", Event: "Coin", To: "Unlocked", Action: "repeat-check"},
 	}
 
-	return NewStateMachine(delegate, transitions...)
+	return fsm.NewStateMachine(delegate, transitions...)
 }
 
-// TrunstileEventProcessor 提供了在转换状态时的 Action
+// TurnstileEventProcessor 提供了在转换状态时的 Action
 type TurnstileEventProcessor struct{}
 
-func (p *TurnstileEventProcessor) OnExit(fromState string, args []interface{}) {
-	// ...
-}
-
-func (p *TurnstileEventProcessor) Action(action string, fromState string, toState string, args []interface{}) {
-	// ...
-}
-
-func (p *TurnstileEventProcessor) OnEnter(toState string, args []interface{}) {
-	// ...
-}
-
-// TurnstileEventProcessor is used to handle turnstile actions.
-type TurnstileEventProcessor struct{}
-
+// OnExit is
 func (p *TurnstileEventProcessor) OnExit(fromState string, args []interface{}) {
 	t := args[0].(*Turnstile)
 	if t.State != fromState {
@@ -63,6 +43,7 @@ func (p *TurnstileEventProcessor) OnExit(fromState string, args []interface{}) {
 	log.Printf("转门 %d 从状态 %s 改变", t.ID, fromState)
 }
 
+// Action is
 func (p *TurnstileEventProcessor) Action(action string, fromState string, toState string, args []interface{}) {
 	t := args[0].(*Turnstile)
 	t.EventCount++
@@ -76,78 +57,13 @@ func (p *TurnstileEventProcessor) Action(action string, fromState string, toStat
 	}
 }
 
+// OnEnter is
 func (p *TurnstileEventProcessor) OnEnter(toState string, args []interface{}) {
 	t := args[0].(*Turnstile)
 	t.State = toState
 	t.States = append(t.States, toState)
 
 	log.Printf("转门 %d 的状态改变为 %s ", t.ID, toState)
-}
-
-func TestFSM(t *testing.T) {
-	ts := &Turnstile{
-		ID:     1,
-		State:  "Locked",
-		States: []string{"Locked"},
-	}
-	fsm := initFSM()
-
-	//推门
-	//没刷卡/投币不可进入
-	err := fsm.Trigger(ts.State, "Push", ts)
-	if err != nil {
-		t.Errorf("trigger err: %v", err)
-	}
-
-	//推门
-	//没刷卡/投币不可进入
-	err = fsm.Trigger(ts.State, "Push", ts)
-	if err != nil {
-		t.Errorf("trigger err: %v", err)
-	}
-
-	//刷卡或者投币
-	//不容易啊，终于解锁了
-	err = fsm.Trigger(ts.State, "Coin", ts)
-	if err != nil {
-		t.Errorf("trigger err: %v", err)
-	}
-
-	//刷卡或者投币
-	//这时才解锁
-	err = fsm.Trigger(ts.State, "Coin", ts)
-	if err != nil {
-		t.Errorf("trigger err: %v", err)
-	}
-
-	//推门
-	//这时才能进入，进入后闸门被锁
-	err = fsm.Trigger(ts.State, "Push", ts)
-	if err != nil {
-		t.Errorf("trigger err: %v", err)
-	}
-
-	//推门
-	//无法进入，闸门已锁
-	err = fsm.Trigger(ts.State, "Push", ts)
-	if err != nil {
-		t.Errorf("trigger err: %v", err)
-	}
-
-	lastState := Turnstile{
-		ID:         1,
-		EventCount: 6,
-		CoinCount:  2,
-		PassCount:  1,
-		State:      "Locked",
-		States:     []string{"Locked", "Unlocked", "Locked"},
-	}
-
-	if !compareTurnstile(&lastState, ts) {
-		t.Errorf("Expected last state: %+v, but got %+v", lastState, ts)
-	} else {
-		t.Logf("最终的状态: %+v", ts)
-	}
 }
 
 func compareTurnstile(t1 *Turnstile, t2 *Turnstile) bool {
@@ -159,15 +75,64 @@ func compareTurnstile(t1 *Turnstile, t2 *Turnstile) bool {
 	return fmt.Sprint(t1.States) == fmt.Sprint(t2.States)
 }
 
-func initFSM() *StateMachine {
-	delegate := &DefaultDelegate{P: &TurnstileEventProcessor{}}
-
-	transitions := []Transition{
-		{From: "Locked", Event: "Coin", To: "Unlocked", Action: "check"},
-		{From: "Locked", Event: "Push", To: "Locked", Action: "invalid-push"},
-		{From: "Unlocked", Event: "Push", To: "Locked", Action: "pass"},
-		{From: "Unlocked", Event: "Coin", To: "Unlocked", Action: "repeat-check"},
+func main() {
+	ts := &Turnstile{
+		ID:     1,
+		State:  "Locked",
+		States: []string{"Locked"},
 	}
+	fsm := initFSM()
 
-	return NewStateMachine(delegate, transitions...)
+	// 输出 fsm 的状态转换图
+	fsm.Export("states.png")
+
+	//推门
+	//没刷卡/投币不可进入
+	err := fsm.Trigger(ts.State, "Push", ts)
+	if err != nil {
+		log.Fatalf("trigger err: %v", err)
+	}
+	//推门
+	//没刷卡/投币不可进入
+	err = fsm.Trigger(ts.State, "Push", ts)
+	if err != nil {
+		log.Fatalf("trigger err: %v", err)
+	}
+	//刷卡或者投币
+	//不容易啊，终于解锁了
+	err = fsm.Trigger(ts.State, "Coin", ts)
+	if err != nil {
+		log.Fatalf("trigger err: %v", err)
+	}
+	//刷卡或者投币
+	//这时才解锁
+	err = fsm.Trigger(ts.State, "Coin", ts)
+	if err != nil {
+		log.Fatalf("trigger err: %v", err)
+	}
+	//推门
+	//这时才能进入，进入后闸门被锁
+	err = fsm.Trigger(ts.State, "Push", ts)
+	if err != nil {
+		log.Fatalf("trigger err: %v", err)
+	}
+	//推门
+	//无法进入，闸门已锁
+	err = fsm.Trigger(ts.State, "Push", ts)
+	if err != nil {
+		log.Fatalf("trigger err: %v", err)
+	}
+	lastState := Turnstile{
+		ID:         1,
+		EventCount: 6,
+		CoinCount:  2,
+		PassCount:  1,
+		State:      "Locked",
+		States:     []string{"Locked", "Unlocked", "Locked"},
+	}
+	if !compareTurnstile(&lastState, ts) {
+		log.Fatalf("Expected last state: %+v, but got %+v", lastState, ts)
+	} else {
+		log.Fatalf("最终的状态: %+v", ts)
+	}
 }
